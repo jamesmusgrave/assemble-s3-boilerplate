@@ -145,7 +145,7 @@ module.exports = function(grunt) {
 		},
 		shell: {
 			cloudflare: {
-				command: "curl https://www.cloudflare.com/api_json.html  -d 'a=fpurge_ts' -d 'tkn=4490bcd83ce01d13388ccdbe81425266024f7' -d 'email=email@domain.com' -d 'z=domain.com' -d 'v=1'"
+				command: "curl https://www.cloudflare.com/api_json.html  -d 'a=fpurge_ts' -d 'tkn=***' -d 'email=email@domain.com' -d 'z=domain.com' -d 'v=1'"
 			}
 		},
 		sass: {
