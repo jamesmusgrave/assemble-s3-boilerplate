@@ -31,7 +31,7 @@ module.exports = function(grunt) {
 				require: true
 			},
 			all: [
-			'js/src/*.js'
+			'js/*.js'
 			]
 		},
 		copy: {
@@ -41,7 +41,7 @@ module.exports = function(grunt) {
 					dest: 'scss/',
 					flatten: true,
 					filter: 'isFile',
-					src: 'bower_components/normalize.css/normalize.css',
+					src: 'node_modules/normalize.css/normalize.css',
 					rename: function(dest, src) {
 						return dest + "_" + src.replace('.css','.scss');
 					}
@@ -55,9 +55,9 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				src: [
-				'bower_components/jquery/dist/jquery.js',
-				'bower_components/raf.js/raf.js',
-				'bower_components/imagesloaded/imagesloaded.pkgd.js',
+				'node_modules/jquery/dist/jquery.js',
+				'node_modules/raf.js/raf.js',
+				'node_modules/imagesloaded/imagesloaded.pkgd.js',
 				'js/*.js'
 				],
 				dest: 'build/js/app.js'
@@ -91,9 +91,10 @@ module.exports = function(grunt) {
 		},
 
 		watch: {
-			css: {
+			build: {
 				files: [
-				'build/css/*.css'
+				'build/css/*.min.css',
+				'build/js/*.min.js'
 				],
 				options: {
 					livereload: true
@@ -106,7 +107,7 @@ module.exports = function(grunt) {
 				options: {
 					livereload: true
 				},
-				tasks: ['concat:dist', 'asciify', 'uglify']
+				tasks: ['js']
 			},
 			html: {
 				files: [
@@ -122,37 +123,36 @@ module.exports = function(grunt) {
 				files: [
 				'scss/*.scss'
 				],
-				tasks: ['sass']
+				tasks: ['css']
 			}
 		},
 
 		s3:{
 			options: {
 				accessKeyId: "",
-				secretAccessKey: "/",
-				bucket: "", //http://*.s3-website-eu-west-1.amazonaws.com/
-				region: "eu-west-1",
-				enableWeb: true,
-				dryRun: false,
-				headers: {
-					CacheControl: 3600
-				}
-			},
-			build: {
-				cwd: "build/",
-				src: "**"
-			}
-		},
-		shell: {
-			cloudflare: {
-				command: "curl https://www.cloudflare.com/api_json.html  -d 'a=fpurge_ts' -d 'tkn=***' -d 'email=email@domain.com' -d 'z=domain.com' -d 'v=1'"
-			}
-		},
+				secretAccessKey: "",
+                bucket: "****", //http://****.s3-website-eu-west-1.amazonaws.com/
+                region: "eu-west-1",
+                enableWeb: true,
+                dryRun: false,
+                headers: {
+                	CacheControl: 3600
+                }
+            },
+            build: {
+            	cwd: "build/",
+            	src: "**"
+            }
+        },
+		// shell: {
+		// 	cloudflare: {
+		// 		command: "curl https://www.cloudflare.com/api_json.html  -d 'a=fpurge_ts' -d 'tkn=***' -d 'email=email@domain.com' -d 'z=domain.com' -d 'v=1'"
+		// 	}
+		// },
 		sass: {
 			dist: {
 				options: {
-					outputStyle: 'expanded',
-					includePaths: require('node-neat').includePaths,
+					outputStyle: 'expanded'
 				},
 				files: [{
 					expand: true,
@@ -189,6 +189,23 @@ module.exports = function(grunt) {
 					port: 3001,
 					base: 'build'
 				}
+			}
+		},
+
+
+		postcss: {
+			options: {
+				map: true,
+				processors: [
+				require('autoprefixer')({
+					browsers: ['last 2 versions']
+				}),
+				require('postcss-clearfix')
+				]
+			},
+			dist: {
+				src: 'build/css/app.css',
+				dest: 'build/css/app.min.css'
 			}
 		},
 
@@ -237,10 +254,13 @@ grunt.loadNpmTasks('grunt-bumpup');
 grunt.loadNpmTasks('grunt-sass');
 grunt.loadNpmTasks('grunt-aws');
 grunt.loadNpmTasks('grunt-favicons');
+grunt.loadNpmTasks('grunt-postcss');
 grunt.loadNpmTasks('assemble');
 
 grunt.registerTask('syncwatch', ['browserSync', 'watch']);
+grunt.registerTask('css', ['sass', 'postcss']);
+grunt.registerTask('js', ['jshint', 'concat:dist', 'asciify', 'uglify']);
 grunt.registerTask('deploy', ['s3:build']); // Add shell:cloudflare to purge cloudflare cache
-grunt.registerTask('default', ['assemble', 'copy', 'jshint', 'concat:dist', 'asciify', 'bumpup', 'uglify', 'sass']);
+grunt.registerTask('default', ['assemble', 'copy', 'js', 'css', 'bumpup']);
 
 };
