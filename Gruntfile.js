@@ -255,7 +255,7 @@ grunt.loadNpmTasks('grunt-sass');
 grunt.loadNpmTasks('grunt-aws');
 grunt.loadNpmTasks('grunt-favicons');
 grunt.loadNpmTasks('grunt-postcss');
-grunt.loadNpmTasks('assemble');
+grunt.loadNpmTasks('grunt-assemble');
 
 grunt.registerTask('syncwatch', ['browserSync', 'watch']);
 grunt.registerTask('css', ['sass', 'postcss']);
