@@ -4,7 +4,7 @@ A boilerplate for building static sites using assemble for s3 deployment.
 Includes browsersync, sass compiling, js concatenation/minification and most importantly favicon generation.
 
 ```bash
-npm install && bower install && grunt syncwatch
+npm install && grunt syncwatch
 ```
 
 And when your ready to deploy to S3
